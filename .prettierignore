@@ -1,0 +1,6 @@
+.vinxi/**,
+.output/**,
+.wrangler/**,
+node_modules/**,
+**/*.cjs,
+public/**
