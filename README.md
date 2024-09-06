@@ -10,4 +10,8 @@ Agoraise is a community-focused fundraising web app that prioritizes security an
 - Transparency: raising money is a challenge for new people. At Agoraise we want the donators not worry about any scams or shady activities. Everything is transparent by design. If the majority of the donators want to have their money back they will have them. Without any fee.
 - Semplicity: the last but not least keyword. We don't want to have people taking hours to understand how to donate or raise money. Start to raise money in 5 minutes! As simple as that.
 
-`Work In Progress`
+Additional info: `Work In Progress`
+
+Video: `Work In Progress`
+
+Made during ETHWarsaw 2024 hackathon
