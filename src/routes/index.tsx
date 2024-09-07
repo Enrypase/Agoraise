@@ -5,7 +5,7 @@ function Card(props: ParentProps & { href: string }) {
   return (
     <A
       href={props.href}
-      class="py-2 px-2  border-2 border-solid border-main rounded-xl p-5 shadow-xl bg-white text:black  hover:bg-main hover:text-white transition-all"
+      class="rounded-xl border-2  border-solid border-main bg-white p-2 text-black shadow-xl transition-all  hover:bg-main hover:text-white"
     >
       {props.children}
     </A>
@@ -13,8 +13,8 @@ function Card(props: ParentProps & { href: string }) {
 }
 export default function Home() {
   return (
-    <main class="text-center mx-auto text-gray-700 p-4">
-      <h1 class="max-6-xs text-6xl text-mainfont-thin uppercase my-16">Agoraise</h1>
+    <main class="mx-auto p-4 text-center text-gray">
+      <h1 class="p-5 text-main">Agoraise</h1>
       <div class="flex justify-center">
         <div class="grid grid-cols-2 gap-2">
           <Card href="/projects">

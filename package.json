@@ -4,19 +4,50 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
-    "start": "vinxi start"
+    "start": "vinxi start",
+    "lint": "eslint .",
+    "prettify": "npx prettier --write ."
   },
   "dependencies": {
-    "@solidjs/router": "^0.14.1",
+    "@solidjs/meta": "^0.29.4",
+    "@solidjs/router": "^0.14.3",
     "@solidjs/start": "^1.0.6",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
-    "solid-js": "^1.8.18",
+    "@tanstack/solid-query": "^5.54.2",
+    "@tanstack/solid-query-devtools": "^5.54.2",
+    "solid-js": "^1.8.22",
     "starknet": "^6.11.0",
     "starknetkit": "^1.1.9",
-    "tailwindcss": "^3.4.3",
-    "vinxi": "^0.4.1"
+    "vinxi": "^0.4.2",
+    "solid-markdown": "^2.0.13",
+    "zod": "^3.23.8",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3"
   },
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@tanstack/eslint-plugin-query": "^5.53.0",
+    "@types/js-cookie": "^3.0.6",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.16.5",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie": "^0.6.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.10.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-solid": "^0.14.3",
+    "eslint-plugin-tailwindcss": "^3.17.4",
+    "globals": "^15.9.0",
+    "typescript-eslint": "7.16.1",
+    "prettier": "^3.3.3",
+    "postcss": "^8.4.45",
+    "typescript": "^5.5.4",
+    "tailwindcss": "^3.4.10"
+  },
+  "trustedDependencies": [
+    "protobufjs"
+  ],
   "engines": {
     "node": ">=18"
   }

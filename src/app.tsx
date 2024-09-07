@@ -4,15 +4,27 @@ import { Suspense } from "solid-js";
 import Nav from "~/components/Nav";
 import "./app.css";
 import { ClientSessionProvider } from "./contexts/ClientSession";
+import { QueryClientProvider } from "@tanstack/solid-query";
+import { QueryClient } from "@tanstack/query-core";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 1,
+      gcTime: 1000 * 60 * 5,
+    },
+  },
+});
 export default function App() {
   return (
     <Router
       root={(props) => (
-        <ClientSessionProvider>
-          <Nav />
-          <Suspense>{props.children}</Suspense>
-        </ClientSessionProvider>
+        <QueryClientProvider client={queryClient}>
+          <ClientSessionProvider>
+            <Nav />
+            <Suspense>{props.children}</Suspense>
+          </ClientSessionProvider>
+        </QueryClientProvider>
       )}
     >
       <FileRoutes />

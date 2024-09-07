@@ -5,7 +5,7 @@ import { useClientSession } from "~/hooks/sessionHooks";
 export default function Nav() {
   const { connectWallet, wallet } = useClientSession();
   return (
-    <nav class="bg-white border-b-2 border-solid border-main flex gap-5 justify-between p-5">
+    <nav class="flex justify-between gap-5 border-b-2 border-solid border-main bg-white p-5">
       <div class="flex gap-5">
         <A href="/pricing">
           <p>Pricing</p>
