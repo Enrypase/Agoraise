@@ -50,21 +50,21 @@ contract CampaignVault is Vault {
 
     }
 
-    function isDepositWindowOpenForMilestone(uint32 id) public returns (bool) {
+    function isDepositWindowOpenForMilestone(uint32 id) public view returns (bool) {
         Milestone memory milestone = manager.getById(address(this), id);
 
         return milestone.start <= block.timestamp && milestone.deadline > block.timestamp;
     }
 
-    function getContributorCount() public returns (uint256) {
+    function getContributorCount() public view returns (uint256) {
         return contributors;
     }
 
-    function extractMetadata() public returns (Campaign memory) {
+    function extractMetadata() public view returns (Campaign memory) {
         return campaignMetadata;
     }
 
-    function listMilestones() public returns (Milestone[] memory) {
+    function listMilestones() public view returns (Milestone[] memory) {
         return manager.enumerate(address(this));
     }
 
@@ -114,12 +114,17 @@ contract MilestoneManager {
         IERC20(milestone.asset).transferFrom(campaign, creator, milestone.allocation);
     }
 
-    function update(address campaign, uint32 id, Milestone memory updated) external allowed(milestones[campaign][id].oracle) {
-        Milestone memory milestone = milestones[campaign][id];
+    function update(address campaign, uint32 id, Milestone calldata updated) external allowed(milestones[campaign][id].oracle) {
+        Milestone storage milestone = milestones[campaign][id];
 
         if(milestone.closed) revert AlreadyResolved(campaign, id);
 
-        milestone = updated;
+        milestone.start = updated.start;
+        milestone.deadline = updated.deadline;
+        milestone.asset = updated.asset;
+        milestone.allocation = updated.allocation;
+        milestone.oracle = updated.oracle;
+        milestone.closed = updated.closed;
     }
 
     function rebalance(address campaign, address asset, uint amount, uint[] calldata hint) external vault(campaign) {
@@ -145,7 +150,7 @@ contract MilestoneManager {
         if(cumulativeAmount != amount) revert BadDistributionHint(campaign, hint);
     }
 
-    function enumerate(address campaign) public returns (Milestone[] memory list) {
+    function enumerate(address campaign) public view returns (Milestone[] memory list) {
         uint total = milestonesCount[campaign];
 
         for(uint32 i = 0; i < total;) {
@@ -157,7 +162,7 @@ contract MilestoneManager {
         }
     }
 
-    function getById(address campaing, uint32 id) public returns (Milestone memory) {
+    function getById(address campaing, uint32 id) public view returns (Milestone memory) {
         return milestones[campaing][id];
     }
 }
