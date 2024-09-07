@@ -81,6 +81,11 @@ error BadDistributionHint(address campaing, uint[] hint);
 // donation per milestone
 // distribution strategy
 contract MilestoneManager {
+    uint256 internal ORACLE_TAX;
+    uint256 internal PROTOCOL_TAX;
+
+    address public treasury;
+
     mapping(address => mapping(uint32 => Milestone)) milestones;
     mapping(address => uint32) milestonesCount;
 
@@ -111,7 +116,12 @@ contract MilestoneManager {
         if(milestone.closed) revert AlreadyResolved(campaign, id);
 
         milestone.closed = true;
-        IERC20(milestone.asset).transferFrom(campaign, creator, milestone.allocation);
+
+        (uint protocolTax, uint oracleTax, uint leftover) = _deductTax(milestone.allocation);
+
+        IERC20(milestone.asset).transferFrom(campaign, treasury, protocolTax);
+        IERC20(milestone.asset).transferFrom(campaign, milestone.oracle, oracleTax);
+        IERC20(milestone.asset).transferFrom(campaign, creator, leftover);
     }
 
     function update(address campaign, uint32 id, Milestone calldata updated) external allowed(milestones[campaign][id].oracle) {
@@ -164,6 +174,14 @@ contract MilestoneManager {
 
     function getById(address campaing, uint32 id) public view returns (Milestone memory) {
         return milestones[campaing][id];
+    }
+
+    function _deductTax(uint amount) internal view returns (uint, uint, uint) {
+        uint protocolTax = (amount * PROTOCOL_TAX) / 1e18;
+        uint oracleTax = (amount * ORACLE_TAX) / 1e18;
+        uint leftover = amount - protocolTax - oracleTax;
+
+        return (protocolTax, oracleTax, leftover);
     }
 }
 
