@@ -76,7 +76,7 @@ contract CampaignVault is Vault {
 error NotAllowed(address target);
 error InvalidMilestone(address campaign, uint32 milestoneId);
 error AlreadyResolved(address campaign, uint32 milestoneId);
-error BadDistributionHint(address campaing, uint[] hint);
+error BadDistributionHint(address campaign, uint[] hint);
 
 // donation per milestone
 // distribution strategy
@@ -172,8 +172,8 @@ contract MilestoneManager {
         }
     }
 
-    function getById(address campaing, uint32 id) public view returns (Milestone memory) {
-        return milestones[campaing][id];
+    function getById(address campaign, uint32 id) public view returns (Milestone memory) {
+        return milestones[campaign][id];
     }
 
     function _deductTax(uint amount) internal view returns (uint, uint, uint) {
