@@ -16,6 +16,7 @@ export default function AppLayout(props: ParentProps) {
             <>
               <p>&gt</p>
               <A
+                classList={{ "text-black": i() === splitted().length - 1 }}
                 href={`/${splitted()
                   .filter((_el, j) => j <= i())
                   .join("/")}`}
