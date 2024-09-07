@@ -6,6 +6,7 @@ import "./app.css";
 import { ClientSessionProvider } from "./contexts/ClientSession";
 import { QueryClientProvider } from "@tanstack/solid-query";
 import { QueryClient } from "@tanstack/query-core";
+import { ComputedVarsProvider } from "./contexts/ComputedVars";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,10 +21,12 @@ export default function App() {
     <Router
       root={(props) => (
         <QueryClientProvider client={queryClient}>
-          <ClientSessionProvider>
-            <Nav />
-            <Suspense>{props.children}</Suspense>
-          </ClientSessionProvider>
+          <ComputedVarsProvider>
+            <ClientSessionProvider>
+              <Nav />
+              <Suspense>{props.children}</Suspense>
+            </ClientSessionProvider>
+          </ComputedVarsProvider>
         </QueryClientProvider>
       )}
     >

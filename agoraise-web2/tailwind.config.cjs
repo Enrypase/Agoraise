@@ -11,6 +11,11 @@ module.exports = {
         darkGray: "#9CADCE",
         activeLink: "#2DC2D6",
       },
+      animation: {
+        fadeIn: "fadeIn 0.25s ease-in-out",
+        popIn: "popIn 0.25s ease-in-out forwards",
+        popOff: "popOff 0.25s ease-in-out",
+      },
     },
   },
   plugins: [],
