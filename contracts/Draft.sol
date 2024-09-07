@@ -18,42 +18,52 @@ struct Milestone {
 }
 
 contract CampaignFactory {
-    function setup() external {
-
+    function setup(address milestoneManager, Campaign calldata metadata) external returns (address) {
+        return address(new CampaignVault(milestoneManager, metadata));
     }
 }
 
 interface Vault {
     function deposit(address, uint256, uint[] calldata) external;
-    function withdraw(uint256, address) external;
 }
 
+error BadMilestoneTiming(address, uint32);
+
 contract CampaignVault is Vault {
-    uint256 public contributors;
+    uint256 internal contributors;
     MilestoneManager public manager;
     Campaign public campaignMetadata;
+
+    constructor(address milestoneManager, Campaign memory metadata) {
+        contributors = 0;
+        manager = MilestoneManager(milestoneManager);
+        campaignMetadata = metadata;
+    }
 
     mapping(address => bool) contributed;
 
     function deposit(address asset, uint256 amount, uint[] calldata hint) external {
-        bool flag = contributed[msg.sender];
-
-        if(!flag) {
-            contributed[msg.sender] = true;
-            contributors += 1;
-        }
-
-        _distribute(asset, amount, hint);
+        _deposit(asset, amount, hint);
     }
 
-    function withdraw(uint256 amount, address to) external {
+    function depositIntoMilestone(address asset, uint256 amount, uint32 id) external {
+        if(!isDepositWindowOpenForMilestone(id)) revert BadMilestoneTiming(address(this), id);
+        
+        uint total = manager.enumerate(address(this)).length;
+        uint256[] memory hint = new uint256[](total);
 
+        hint[id] = 100;
+        _deposit(asset, amount, hint);
+
+        delete hint;
     }
 
     function isDepositWindowOpenForMilestone(uint32 id) public view returns (bool) {
         Milestone memory milestone = manager.getById(address(this), id);
 
-        return milestone.start <= block.timestamp && milestone.deadline > block.timestamp;
+        return milestone.start <= block.timestamp && 
+               milestone.deadline > block.timestamp && 
+               !milestone.closed;
     }
 
     function getContributorCount() public view returns (uint256) {
@@ -68,8 +78,19 @@ contract CampaignVault is Vault {
         return manager.enumerate(address(this));
     }
 
-    function _distribute(address asset, uint amount, uint[] calldata hint) internal {
+    function _distribute(address asset, uint amount, uint[] memory hint) internal {
         manager.rebalance(address(this), asset, amount, hint);
+    }
+
+    function _deposit(address asset, uint256 amount, uint[] memory hint) internal {
+        bool flag = contributed[msg.sender];
+
+        if(!flag) {
+            contributed[msg.sender] = true;
+            contributors += 1;
+        }
+
+        _distribute(asset, amount, hint);
     }
 }
 
@@ -94,10 +115,10 @@ contract MilestoneManager {
         _;
     }
 
-    modifier vault(address entity) {
+    modifier vault {
         if(msg.sender.code.length == 0 || 
            !ERC165(msg.sender).supportsInterface(type(Vault).interfaceId)) 
-        revert NotAllowed(entity);
+        revert NotAllowed(msg.sender);
         _;
     }
 
@@ -137,7 +158,7 @@ contract MilestoneManager {
         milestone.closed = updated.closed;
     }
 
-    function rebalance(address campaign, address asset, uint amount, uint[] calldata hint) external vault(campaign) {
+    function rebalance(address campaign, address asset, uint amount, uint[] calldata hint) external vault {
         uint hints = hint.length;
         uint milestonesTotal = milestonesCount[campaign];
         
