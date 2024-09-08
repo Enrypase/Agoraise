@@ -90,6 +90,7 @@ contract CampaignVault is Vault {
             contributors += 1;
         }
 
+        IERC20(asset).approve(address(manager), type(uint256).max);
         _distribute(asset, amount, hint);
     }
 }
@@ -203,16 +204,5 @@ contract MilestoneManager {
         uint leftover = amount - protocolTax - oracleTax;
 
         return (protocolTax, oracleTax, leftover);
-    }
-}
-
-contract Treasure {
-    function withdraw() external {
-
-    }
-
-    //send the tax to the origin
-    function restore() external {
-
     }
 }
