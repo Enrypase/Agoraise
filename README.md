@@ -17,17 +17,11 @@ Video: `Work In Progress`
 Made during ETHWarsaw 2024 hackathon
 
 ## Deployments
-|Sei EVM Devnet|
-|----------|----------------------------------|
-|EntryPoint|*Failed to deploy due to EIP-170*|
-|Singletone Paymaster V7|[0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e](https://seitrace.com/address/0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e?chain=arctic-1&page=1&next_page_params=%257B%257D)|
-|CampaignFactory|[0xB72E172F5De80727c3D9f4435C3338E1Ee5A5b23]()|
-|MilestoneManager|[0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf]()|
-|CampaignVault|[0xd15361cCB4dD2e30C079641C4F78480608F94636]()|
-
-Aleph Zero EVM Testnet
-|EntryPoint|[0x2a858e44dF145C405c81d1C2BC46AEB74878c1a7](https://evm-explorer-testnet.alephzero.org/address/0x2a858e44dF145C405c81d1C2BC46AEB74878c1a7)|
-|Singletone Paymaster V7|[0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e]()|
-|CampaignFactory|[0xB72E172F5De80727c3D9f4435C3338E1Ee5A5b23]()|
-|MilestoneManager|[0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf]()|
-|CampaignVault|[0xd15361cCB4dD2e30C079641C4F78480608F94636]()|
+Accepting technical challenges related to account abstraction and related infrastructure, it was decided to conduct deployments on Sei EVM and Aleph Zero EVM networks.
+|Name|   Address   | Sei EVM Devnet | Aleph0 EVM Testnet |
+|-----------|--------|----------|-------------|
+|EntryPoint|0x2a858e44dF145C405c81d1C2BC46AEB74878c1a7| *Failed (EIP-170)*| [Explorer](https://evm-explorer-testnet.alephzero.org/address/0x2a858e44dF145C405c81d1C2BC46AEB74878c1a7) |
+|Singletone Paymaster V7|0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e|[SeiTrace](https://seitrace.com/address/0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e?chain=arctic-1&page=1&next_page_params=%257B%257D)|[Explorer](https://evm-explorer-testnet.alephzero.org/address/0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e)|
+|CampaignFactory|0xB72E172F5De80727c3D9f4435C3338E1Ee5A5b23|[SeiTrace](https://seitrace.com/address/0xB72E172F5De80727c3D9f4435C3338E1Ee5A5b23?chain=arctic-1&page=1&next_page_params=%257B%257D)|[Explorer](https://evm-explorer-testnet.alephzero.org/address/0xB72E172F5De80727c3D9f4435C3338E1Ee5A5b23)|
+|MilestoneManager|0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf|[SeiTrace](https://seitrace.com/address/0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf?chain=arctic-1&page=1&next_page_params=%257B%257D)|[Explorer](https://evm-explorer-testnet.alephzero.org/address/0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf)|
+|CampaignVault|0xd15361cCB4dD2e30C079641C4F78480608F94636|[SeiTrace](https://seitrace.com/address/0xd15361cCB4dD2e30C079641C4F78480608F94636?chain=arctic-1&page=1&next_page_params=%257B%257D)|[Explorer](https://evm-explorer-testnet.alephzero.org/address/0xd15361cCB4dD2e30C079641C4F78480608F94636)|
