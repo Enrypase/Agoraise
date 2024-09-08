@@ -1,8 +1,11 @@
 import { A, useSearchParams } from "@solidjs/router";
+import { createQuery } from "@tanstack/solid-query";
+import axios from "axios";
 import { createSignal, For, Show } from "solid-js";
 import DonutChart from "~/components/charts/DonutChart";
 import Social from "~/components/Social";
 import Svg from "~/components/Svg";
+import { BASE_URL } from "~/libs/variables";
 
 const fullMoc = {
   metadata: {
@@ -51,36 +54,46 @@ function Votations(props: { title: string }) {
     </div>
   );
 }
-export default function Project(props?: {
+
+type ProjectType = {
   mainImage: string;
   logoImage: string;
   title: string;
-  tags: string[];
+  tags: string;
   mainDescription: string;
   type: string;
-  socials: string[];
+  socials: string;
   mainPaymentsDescription: string;
   sm: "Yes" | "No";
   socialsTitle: string;
   socialsDescription: string;
   paymentsTitle: string;
   paymentsDescription: string;
-}) {
+};
+export default function Project(props?: ProjectType) {
+  const data = createQuery<ProjectType>(() => ({
+    queryKey: ["projects", 0],
+    queryFn: async () => {
+      return (await axios.get(`${BASE_URL}/api/v0/projects/0`)).data;
+    },
+  }));
+
   const [, setSearchParams] = useSearchParams();
   const [colors, setColors] = createSignal<string[]>([]);
-  const mainImage = () => props?.mainImage || "";
-  const logoImage = () => props?.logoImage || "";
-  const title = () => props?.title || "Defaulted";
-  const type = () => props?.type || "Defaulted";
-  const mainDescription = () => props?.mainDescription || "Defaulted";
-  const mainPaymentsDescription = () => props?.mainPaymentsDescription || "Defaulted";
-  const sm = () => props?.sm || "No";
-  const socialsTitle = () => props?.socialsTitle || "Defaulted";
-  const socialsDescription = () => props?.socialsDescription || "Defaulted";
-  const paymentsTitle = () => props?.paymentsTitle || "Defaulted";
-  const paymentsDescription = () => props?.paymentsDescription || "Defaulted";
-  const tags = () => props?.tags || ["Defaulted", "Defaulted"];
-  const socials = () => props?.socials || ["Defaulted", "Defaulted"];
+  const mainImage = () => props?.mainImage || data.data?.mainImage || "";
+  const logoImage = () => props?.logoImage || data.data?.logoImage || "";
+  const title = () => props?.title || data.data?.title || "Defaulted";
+  const type = () => props?.type || data.data?.type || "Defaulted";
+  const mainDescription = () => props?.mainDescription || data.data?.mainDescription || "Defaulted";
+  const mainPaymentsDescription = () =>
+    props?.mainPaymentsDescription || data.data?.mainPaymentsDescription || "Defaulted";
+  const sm = () => props?.sm || data.data?.sm || "No";
+  const socialsTitle = () => props?.socialsTitle || data.data?.socialsTitle || "Defaulted";
+  const socialsDescription = () => props?.socialsDescription || data.data?.socialsDescription || "Defaulted";
+  const paymentsTitle = () => props?.paymentsTitle || data.data?.paymentsTitle || "Defaulted";
+  const paymentsDescription = () => props?.paymentsDescription || data.data?.paymentsDescription || "Defaulted";
+  const tags = () => props?.tags || data.data?.tags || "DefaultedTag";
+  const socials = () => props?.socials || data.data?.socials || "https://defaulted";
   return (
     <div class="min-h-screen p-5">
       <div class="relative grid gap-5 md:grid-cols-[auto,min(max(20rem,33vw),500px)]">
@@ -182,22 +195,28 @@ export default function Project(props?: {
           <div class="sticky left-0 top-0 flex flex-col gap-10 py-5">
             <div class="overflow-hidden rounded-xl shadow-xl">
               <div
-                class="h-32 w-full bg-contain bg-center bg-no-repeat"
-                style={{ "background-image": `url(${mainImage()})` }}
+                class="h-32 w-full bg-cover bg-center bg-no-repeat"
+                style={{
+                  "background-image": `url(https://${import.meta.env.VITE_PINATA_GATEWAY}/ipfs/${mainImage()})`,
+                }}
               />
               <div class="relative flex flex-col gap-5 p-10">
                 <div
                   class="absolute left-10 top-0 size-16 -translate-y-1/2 rounded-full bg-contain bg-center bg-no-repeat"
-                  style={{ "background-image": `url(${logoImage()})` }}
+                  style={{
+                    "background-image": `url(https://${import.meta.env.VITE_PINATA_GATEWAY}/ipfs/${logoImage()})`,
+                  }}
                 />
                 <h4>{title()}</h4>
                 <div class="flex gap-2">
-                  <For each={tags()}>{(t) => <p class="rounded-xl bg-blue px-2 py-1 text-white">{t}</p>}</For>
+                  <For each={tags().split(" ")}>
+                    {(t) => <p class="rounded-xl bg-blue px-2 py-1 text-white">{t}</p>}
+                  </For>
                 </div>
                 <div class="flex items-center gap-2">
                   <p>Community</p>
                   <div class="flex gap-1">
-                    <For each={socials()}>
+                    <For each={socials().split(" ")}>
                       {(s) => (
                         <A href={s} target="_blank">
                           <Social name={s.split("://")[1].split(".")[0].toLowerCase()} />

@@ -7,10 +7,11 @@ let pinata: PinataSDK | null = null;
 export const usePinata = () => {
   "use server";
   if (pinata) return pinata;
-  if (!process.env.PINATA_JWT || !process.env.PINATA_GATEWAY) throw new Error("PINATA_JWT or PINATA_GATEWAY not found");
+  if (!process.env.PINATA_JWT || !process.env.VITE_PINATA_GATEWAY)
+    throw new Error("PINATA_JWT or VITE_PINATA_GATEWAY not found");
   pinata = new PinataSDK({
     pinataJwt: process.env.PINATA_JWT,
-    pinataGateway: process.env.PINATA_GATEWAY,
+    pinataGateway: process.env.VITE_PINATA_GATEWAY,
   });
 
   return pinata;

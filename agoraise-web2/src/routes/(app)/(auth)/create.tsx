@@ -1,18 +1,23 @@
 import { useSearchParams } from "@solidjs/router";
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import Form, { Input } from "~/libs/form";
 import Project from "../projects/[id]";
 import DropZone from "~/libs/DropZone";
 import axios from "axios";
 import { BASE_URL } from "~/libs/variables";
+import { useClientSession } from "~/hooks/sessionHooks";
 
+type MilestoneType = {
+  endDate: number;
+  amount: number;
+};
 const [store, setStore] = createStore({
   title: "",
-  tags: [""],
+  tags: "",
   mainDescription: "",
   type: "",
-  socials: [""],
+  socials: "",
   mainPaymentsDescription: "",
   sm: "No" as "Yes" | "No",
   socialsTitle: "",
@@ -21,13 +26,15 @@ const [store, setStore] = createStore({
   paymentsDescription: "",
   mainImage: "",
   logoImage: "",
+  milestones: [] as MilestoneType[],
 });
 export default function Create() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { wallet } = useClientSession();
+
   async function submitData(data: FormData) {
-    console.log("pushing ", data);
-    const res = await axios.post(`${BASE_URL}/api/v0/projects`, data);
-    console.log(res);
+    if (wallet()?.selectedAddress) data.set("owner", wallet()!.selectedAddress!);
+    await axios.post(`${BASE_URL}/api/v0/projects`, data);
   }
   return (
     <div class="flex items-center justify-center">
@@ -49,7 +56,9 @@ export default function Create() {
           <h1>Create A New Fundraise Campaign</h1>
           <Form
             class="flex flex-col gap-5"
-            asyncSuccessCallback={(data) => submitData(data as FormData)}
+            asyncSuccessCallback={(data) => {
+              return submitData(data as FormData);
+            }}
             returnFormData={true}
           >
             <div class="flex gap-5">
@@ -92,7 +101,7 @@ export default function Create() {
               <div>
                 <Input fn={(title) => setStore({ title })} name="title" title="Title" type="text" value={store.title} />
                 <Input
-                  fn={(tags) => setStore({ tags: tags.split(" ") })}
+                  fn={(tags) => setStore({ tags })}
                   name="tags"
                   title="Insert a list of tags separated by a space"
                   type="text"
@@ -121,7 +130,7 @@ export default function Create() {
               value={store.type}
             />
             <Input
-              fn={(socials) => setStore({ socials: socials.split(" ") })}
+              fn={(socials) => setStore({ socials })}
               name="socials"
               title="Insert your socials separated by a space"
               type="text"
@@ -176,6 +185,61 @@ export default function Create() {
               type="textarea"
               value={store.paymentsDescription}
             />
+            <h4>Milestones:</h4>
+            <div class="flex flex-wrap gap-5">
+              <For each={store.milestones}>
+                {(m, i) => (
+                  <div class="relative">
+                    <button
+                      type="button"
+                      class="absolute right-0 top-0 size-6 rounded-full bg-red text-white"
+                      onClick={() =>
+                        setStore({
+                          milestones: store.milestones.filter((el) => JSON.stringify(el) !== JSON.stringify(m)),
+                        })
+                      }
+                    >
+                      <p>X</p>
+                    </button>
+                    <div class="flex gap-2">
+                      <input
+                        class="rounded-xl border-2 border-solid border-main px-8 py-2"
+                        type="date"
+                        name="milestoneEndDate"
+                        value={new Date(m.endDate).toISOString().split("T")[0]}
+                        min={new Date().toISOString().split("T")[0]}
+                        onBlur={(e) => {
+                          const newMilestones = [...store.milestones];
+                          newMilestones[i()] = { ...m, endDate: new Date(e.target.value).getTime() / 1000 };
+                          setStore({ milestones: newMilestones });
+                          console.log(newMilestones);
+                        }}
+                      />
+                      <input
+                        class="rounded-xl border-2 border-solid border-main px-8 py-2"
+                        type="number"
+                        name="milestoneAmount"
+                        value={m.amount}
+                        onBlur={(e) => {
+                          const newMilestones = [...store.milestones];
+                          newMilestones[i()] = { ...m, amount: parseInt(e.target.value) };
+                          setStore({ milestones: newMilestones });
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </For>
+              <button
+                type="button"
+                class="rounded-xl bg-main px-6 py-2 text-white"
+                onClick={() => {
+                  setStore({ milestones: [...store.milestones, { endDate: 0, amount: 0 }] });
+                }}
+              >
+                <p>Add Milestone!</p>
+              </button>
+            </div>
             <div class="flex gap-5 py-5">
               <button
                 class="w-full rounded-xl bg-blue py-2 text-white"

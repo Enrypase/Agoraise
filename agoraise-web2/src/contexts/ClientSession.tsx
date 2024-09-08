@@ -15,6 +15,7 @@ export const ClientSessionProvider = (props: ParentProps) => {
   async function connectWallet() {
     const w = await connect();
     setWallet(w.wallet || null);
+    console.log(w);
   }
   async function disconnectWallet() {
     await disconnect();
