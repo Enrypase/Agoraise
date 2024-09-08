@@ -18,7 +18,16 @@ Made during ETHWarsaw 2024 hackathon
 
 ## Deployments
 |Sei EVM Devnet|
+|----------|----------------------------------|
+|EntryPoint|*Failed to deploy due to EIP-170*|
 |Singletone Paymaster V7|[0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e](https://seitrace.com/address/0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e?chain=arctic-1&page=1&next_page_params=%257B%257D)|
+|CampaignFactory|[0xB72E172F5De80727c3D9f4435C3338E1Ee5A5b23]()|
+|MilestoneManager|[0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf]()|
+|CampaignVault|[0xd15361cCB4dD2e30C079641C4F78480608F94636]()|
+
+Aleph Zero EVM Testnet
+|EntryPoint|[0x2a858e44dF145C405c81d1C2BC46AEB74878c1a7](https://evm-explorer-testnet.alephzero.org/address/0x2a858e44dF145C405c81d1C2BC46AEB74878c1a7)|
+|Singletone Paymaster V7|[0xB2AA7F204b579CF4899239B0648DbFC7666A1d9e]()|
 |CampaignFactory|[0xB72E172F5De80727c3D9f4435C3338E1Ee5A5b23]()|
 |MilestoneManager|[0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf]()|
 |CampaignVault|[0xd15361cCB4dD2e30C079641C4F78480608F94636]()|
