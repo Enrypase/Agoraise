@@ -25,7 +25,7 @@ export default function Home() {
             <p>Influence the projects you're interested in</p>
           </Card>
           <Card href="/create">
-            <h4>Raise</h4>
+            <h4 class="uppercase">Raise</h4>
             <p>Built-in community interactions</p>
             <p>Leverage every Social Media</p>
             <p>Feeless Charity Donations</p>

@@ -8,7 +8,10 @@ import { SolidMarkdown } from "solid-markdown";
 
 function Project(props: ProjectType & { id: string }) {
   return (
-    <A href={`./${props.id}`} class="relative flex flex-col rounded-xl shadow-xl transition-all hover:shadow-2xl">
+    <A
+      href={`./${props.id}`}
+      class="relative flex flex-col overflow-hidden rounded-xl shadow-xl transition-all hover:shadow-2xl"
+    >
       <div
         class="h-32 w-full bg-cover bg-center bg-no-repeat"
         style={{

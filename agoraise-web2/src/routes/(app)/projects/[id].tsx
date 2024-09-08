@@ -294,10 +294,11 @@ export default function Project(props?: ProjectType) {
               <div class="flex flex-col items-center justify-center">
                 <div class="relative">
                   <DonutChart
-                    series={(props?.milestones || data.data?.milestones || []).map((el, i) => ({
-                      number: el.amount,
-                      notActive: i > 0,
-                    }))}
+                    series={(props?.milestones || data.data?.milestones || []).map((el, i) => {
+                      const data = { number: parseInt(el.amount.toString()), notActive: i > 0 };
+                      console.log(data);
+                      return data;
+                    })}
                     labels={(props?.milestones || data.data?.milestones || []).map((_m, i) => `Milestone ${i}`)}
                     setColors={(data) => setColors(data)}
                   />

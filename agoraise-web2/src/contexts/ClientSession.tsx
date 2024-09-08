@@ -24,10 +24,7 @@ export const ClientSessionProvider = (props: ParentProps) => {
     await disconnect();
     setWallet(null);
   }
-  const [projects, setProjects] = createSignal([
-    "bafkreiald37fptohhsiaz5rslq5xculszva4lrxsy2qw25lh2b7tanfa6u",
-    "bafkreignofw4qebs7por34oxqhk6o6kijpnrqhlv7unnkqbabi5lttp5mq",
-  ]);
+  const [projects, setProjects] = createSignal<string[]>([]);
   const [votePower, setVotePower] = createSignal(20);
   return (
     <ClientSessionContext.Provider

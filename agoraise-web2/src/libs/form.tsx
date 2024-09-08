@@ -785,11 +785,11 @@ export default function Form(props: {
     }
     // Handling callbacks
     if (props.successCallback) {
-      props.successCallback(finalObj);
+      props.successCallback(new FormData(e.target as HTMLFormElement));
     }
     if (props.asyncSuccessCallback) {
       try {
-        await props.asyncSuccessCallback(finalObj);
+        await props.asyncSuccessCallback(new FormData(e.target as HTMLFormElement));
       } catch (e) {
         if (e instanceof AxiosError) {
           const status = e.response!.status.toString();
