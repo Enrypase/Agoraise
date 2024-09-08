@@ -54,7 +54,7 @@ export default function Create() {
             </div>
           }
         >
-          <h1>Create A New Fundraise Campaign</h1>
+          <h1 class="py-2 text-center">Create A New Fundraise Campaign</h1>
           <Form
             class="flex flex-col gap-5"
             asyncSuccessCallback={(data) => {

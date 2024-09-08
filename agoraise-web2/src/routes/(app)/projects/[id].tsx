@@ -1,11 +1,13 @@
 import { A, useParams, useSearchParams } from "@solidjs/router";
 import { createQuery } from "@tanstack/solid-query";
 import axios from "axios";
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, Setter, Show } from "solid-js";
 import { SolidMarkdown } from "solid-markdown";
 import DonutChart from "~/components/charts/DonutChart";
 import Social from "~/components/Social";
 import Svg from "~/components/Svg";
+import { useClientSession } from "~/hooks/sessionHooks";
+import Form, { Input } from "~/libs/form";
 import { BASE_URL } from "~/libs/variables";
 
 const fullMoc = {
@@ -17,26 +19,31 @@ const fullMoc = {
     target: 50000,
   },
   owner: "0x...",
-  raised: 4000,
-  users: 50,
+  raised: 0,
+  users: 0,
   state: "active",
 };
-const votations = [
-  {
-    title: "Title",
-    description: "Lorem Ipsum is Lorem Ipsum Lorem Ipsum",
-  },
-];
 
-function Votations(props: { title: string }) {
+type VotationType = { title: string; description: string; options: string[] }[];
+
+function Votations(props: { title: string; votations: VotationType; setVotations: Setter<VotationType> }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { votePower, setVotePower } = useClientSession();
+  const [hasVoted, setHasVoted] = createSignal(-1);
   return (
     <div id="votations" class="rounded-xl p-5 shadow-xl">
-      <h1>Votations</h1>
-      <p>Wanna contribute to {props.title}? Here you can do that!</p>
-      <div class="grid grid-cols-[max(min(25rem,25vw),333px),auto] gap-5 p-5">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-col gap-2">
+          <h1>Votations</h1>
+          <p>Wanna contribute to {props.title}? Here you can do that!</p>
+        </div>
+        <p class="rounded-full bg-gray px-8 py-2 text-main">
+          <span>{votePower()}</span> Vote-Power
+        </p>
+      </div>
+      <div class="flex flex-col-reverse gap-5 p-5 md:grid md:grid-cols-[max(min(25rem,25vw),333px),auto]">
         <div class="flex max-h-[75vh] flex-col gap-2 overflow-auto">
-          <For each={Array.from({ length: 15 }).map(() => votations[0])}>
+          <For each={props.votations}>
             {(v, i) => (
               <button
                 id={`votation_${i()}`}
@@ -49,8 +56,52 @@ function Votations(props: { title: string }) {
               </button>
             )}
           </For>
+          <Form
+            class="mr-1 flex flex-col gap-2 rounded-xl"
+            successCallback={(data) => {
+              props.setVotations((v) => [...v, { title: data.title, description: data.description, options: [] }]);
+            }}
+          >
+            <Input title="Title" type="text" name="title" />
+            <Input title="Description" type="text" name="description" />
+            <Input type="submit" value="Create New Votation!" name="" />
+          </Form>
         </div>
-        <div class="size-full rounded-xl bg-black" />
+        <div class="flex size-full min-h-[45dvh] grow flex-col gap-5 rounded-xl">
+          <Show when={searchParams.votation} fallback={<div class="size-full grow rounded-xl bg-gray" />}>
+            <For each={props.votations[parseInt(searchParams.votation!)].options}>
+              {(o, i) => (
+                <Show
+                  when={hasVoted() === -1}
+                  fallback={
+                    <div class="relative flex h-10 w-full items-center justify-center overflow-hidden rounded-xl bg-main py-2 text-white">
+                      {hasVoted() === i() ? <p>{o}: 100%</p> : <p>{o}: 0%</p>}
+                    </div>
+                  }
+                >
+                  <button
+                    class="flex h-10 w-full items-center justify-center rounded-xl bg-main py-2 text-white"
+                    onClick={() => {
+                      setHasVoted(i());
+                      setVotePower((v) => v + 0.1);
+                    }}
+                  >
+                    <p>{o}</p>
+                  </button>
+                </Show>
+              )}
+            </For>
+            <input
+              type="text"
+              class="w-full rounded-xl border-2 border-solid border-main px-6 py-2"
+              onBlur={(e) => {
+                const arr = [...props.votations];
+                arr[parseInt(searchParams.votation!)].options.push(e.target.value);
+                props.setVotations(arr);
+              }}
+            />
+          </Show>
+        </div>
       </div>
     </div>
   );
@@ -58,14 +109,14 @@ function Votations(props: { title: string }) {
 
 export default function Project(props?: ProjectType) {
   const params = useParams();
-  const data = createQuery<ProjectType>(() => ({
-    queryKey: ["projects", params.id],
-    queryFn: async () => {
-      return (await axios.get(`${BASE_URL}/api/v0/projects/${params.id}`)).data;
-    },
-  }));
-
-  const [, setSearchParams] = useSearchParams();
+  const data = !props?.title
+    ? createQuery<ProjectType>(() => ({
+        queryKey: ["projects", params.id],
+        queryFn: async () => {
+          return (await axios.get(`${BASE_URL}/api/v0/projects/${params.id}`)).data;
+        },
+      }))
+    : { data: null };
   const [colors, setColors] = createSignal<string[]>([]);
   const mainImage = () => props?.mainImage || data.data?.mainImage || "";
   const logoImage = () => props?.logoImage || data.data?.logoImage || "";
@@ -81,6 +132,7 @@ export default function Project(props?: ProjectType) {
   const paymentsDescription = () => props?.paymentsDescription || data.data?.paymentsDescription || "Defaulted";
   const tags = () => props?.tags || data.data?.tags || "DefaultedTag";
   const socials = () => props?.socials || data.data?.socials || "https://defaulted";
+  const [votations, setVotations] = createSignal<{ title: string; description: string; options: string[] }[]>([]);
   return (
     <div class="min-h-screen p-5">
       <div class="relative grid gap-5 md:grid-cols-[auto,min(max(20rem,33vw),500px)]">
@@ -114,7 +166,7 @@ export default function Project(props?: ProjectType) {
                 </div>
                 <div class="relative rounded-xl rounded-tl-none bg-gray p-5 text-white">
                   <p class="text-darkGray">Total Votations</p>
-                  <h4 class="font-bold text-main">02</h4>
+                  <h4 class="font-bold text-main">{votations().length}</h4>
                   <Svg
                     href="/icons/votations.svg#votations"
                     attr={{ viewBox: "0 0 17 18" }}
@@ -129,21 +181,11 @@ export default function Project(props?: ProjectType) {
               <div class="relative flex grow flex-col gap-2 rounded-xl bg-gray p-5">
                 <h4>Active Votations:</h4>
                 <div class="flex max-h-48 flex-col gap-1 overflow-auto">
-                  <For each={Array.from({ length: 8 }).map(() => votations[0])}>
-                    {(v, i) => (
-                      <div class="flex justify-between">
-                        <div class="flex gap-1">
-                          <p class="font-bold">{v.title}</p>
-                        </div>
-                        <button
-                          class="mr-1 rounded-full bg-main px-5 py-1 text-white"
-                          onClick={() => {
-                            setSearchParams({ votation: i() });
-                            document.getElementById("votations")!.scrollIntoView();
-                          }}
-                        >
-                          Vote
-                        </button>
+                  <For each={votations()}>
+                    {(v) => (
+                      <div class="flex gap-2">
+                        <p class="text-main">{v.title}</p>
+                        <p class="text-darkGray">{v.description}</p>
                       </div>
                     )}
                   </For>
@@ -162,14 +204,20 @@ export default function Project(props?: ProjectType) {
               <SolidMarkdown class="text-darkGray">{mainPaymentsDescription()}</SolidMarkdown>
               <div class="grid grid-cols-2 gap-5">
                 <Show when={sm() === "Yes"}>
-                  <div class="flex flex-col gap-2 rounded-xl p-5 shadow-xl">
+                  <div class="relative flex flex-col gap-2 rounded-xl p-5 shadow-xl">
                     <SolidMarkdown class="text-darkGray">{socialsDescription()}</SolidMarkdown>
                     <h6 class="uppercase">{socialsTitle()}</h6>
+                    <div class="absolute bottom-0 right-0 size-10 translate-x-2 translate-y-2 rounded-full bg-blue p-2">
+                      <Svg href="/icons/arrow.svg#arrow" attr={{ viewBox: "0 0 29 29" }} class="h-full" />
+                    </div>
                   </div>
                 </Show>
-                <div class="flex flex-col gap-2 rounded-xl p-5 shadow-xl">
+                <div class="relative flex flex-col gap-2 rounded-xl p-5 shadow-xl">
                   <SolidMarkdown class="text-darkGray">{paymentsDescription()}</SolidMarkdown>
                   <h6 class="uppercase">{paymentsTitle()}</h6>
+                  <div class="absolute bottom-0 right-0 size-10 translate-x-2 translate-y-2 rounded-full bg-blue p-2">
+                    <Svg href="/icons/arrow.svg#arrow" attr={{ viewBox: "0 0 29 29" }} class="h-full" />
+                  </div>
                 </div>
               </div>
               <button class="flex w-full justify-center gap-1 rounded-xl bg-main p-2 text-center text-white">
@@ -253,20 +301,23 @@ export default function Project(props?: ProjectType) {
                     labels={(props?.milestones || data.data?.milestones || []).map((_m, i) => `Milestone ${i}`)}
                     setColors={(data) => setColors(data)}
                   />
-                  <h4 class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">$55</h4>
                 </div>
                 <div class="flex flex-wrap gap-1">
-                  <For each={colors()}>{(color) => <p style={{ color }}>On</p>}</For>
+                  <For each={colors()}>
+                    {(background, i) => (
+                      <p class="rounded-xl px-6 py-2 text-white" style={{ background }}>
+                        Milestone {i()}
+                      </p>
+                    )}
+                  </For>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
-        <div>Milestone</div>
-      </div>
-      <Votations title={title()} />
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">{/*<div>Milestone</div>*/}</div>
+      <Votations title={title()} votations={votations()} setVotations={setVotations} />
     </div>
   );
 }

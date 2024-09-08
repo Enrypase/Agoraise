@@ -9,6 +9,8 @@ type ClientSessionContextType = {
   disconnectWallet: () => void;
   projects: Accessor<string[]>;
   setProjects: Setter<string[]>;
+  votePower: Accessor<number>;
+  setVotePower: Setter<number>;
 };
 
 export const ClientSessionContext = createContext<ClientSessionContextType>();
@@ -26,6 +28,7 @@ export const ClientSessionProvider = (props: ParentProps) => {
     "bafkreiald37fptohhsiaz5rslq5xculszva4lrxsy2qw25lh2b7tanfa6u",
     "bafkreignofw4qebs7por34oxqhk6o6kijpnrqhlv7unnkqbabi5lttp5mq",
   ]);
+  const [votePower, setVotePower] = createSignal(20);
   return (
     <ClientSessionContext.Provider
       value={{
@@ -35,6 +38,8 @@ export const ClientSessionProvider = (props: ParentProps) => {
         disconnectWallet,
         projects,
         setProjects,
+        votePower,
+        setVotePower,
       }}
     >
       {props.children}
