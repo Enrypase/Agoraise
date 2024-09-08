@@ -1,10 +1,8 @@
 import axios from "axios";
+import { APIEvent } from "@solidjs/start/server";
 
-export async function GET() {
+export async function GET(event: APIEvent) {
   "use server";
-  const data = await axios.get(
-    `https://${process.env.VITE_PINATA_GATEWAY}/ipfs/bafkreiald37fptohhsiaz5rslq5xculszva4lrxsy2qw25lh2b7tanfa6u`,
-  );
-  console.log(data.data);
+  const data = await axios.get(`https://${process.env.VITE_PINATA_GATEWAY}/ipfs/${event.params.id}`);
   return new Response(JSON.stringify(data.data));
 }

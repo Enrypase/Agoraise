@@ -1,7 +1,8 @@
-import { A, useSearchParams } from "@solidjs/router";
+import { A, useParams, useSearchParams } from "@solidjs/router";
 import { createQuery } from "@tanstack/solid-query";
 import axios from "axios";
 import { createSignal, For, Show } from "solid-js";
+import { SolidMarkdown } from "solid-markdown";
 import DonutChart from "~/components/charts/DonutChart";
 import Social from "~/components/Social";
 import Svg from "~/components/Svg";
@@ -55,26 +56,12 @@ function Votations(props: { title: string }) {
   );
 }
 
-type ProjectType = {
-  mainImage: string;
-  logoImage: string;
-  title: string;
-  tags: string;
-  mainDescription: string;
-  type: string;
-  socials: string;
-  mainPaymentsDescription: string;
-  sm: "Yes" | "No";
-  socialsTitle: string;
-  socialsDescription: string;
-  paymentsTitle: string;
-  paymentsDescription: string;
-};
 export default function Project(props?: ProjectType) {
+  const params = useParams();
   const data = createQuery<ProjectType>(() => ({
-    queryKey: ["projects", 0],
+    queryKey: ["projects", params.id],
     queryFn: async () => {
-      return (await axios.get(`${BASE_URL}/api/v0/projects/0`)).data;
+      return (await axios.get(`${BASE_URL}/api/v0/projects/${params.id}`)).data;
     },
   }));
 
@@ -168,20 +155,20 @@ export default function Project(props?: ProjectType) {
                 <Svg href="/icons/globe.svg#globe" attr={{ viewBox: "0 0 20 19" }} class="size-6" />
                 <h4>About This Project</h4>
               </div>
-              <p class="text-darkGray">{mainDescription()}</p>
+              <SolidMarkdown class="text-darkGray">{mainDescription()}</SolidMarkdown>
             </div>
             <div class="flex w-full flex-col gap-5 rounded-xl p-5 shadow-xl">
               <h4>Interact With {title()}</h4>
-              <p class="text-darkGray">{mainPaymentsDescription()}</p>
+              <SolidMarkdown class="text-darkGray">{mainPaymentsDescription()}</SolidMarkdown>
               <div class="grid grid-cols-2 gap-5">
                 <Show when={sm() === "Yes"}>
                   <div class="flex flex-col gap-2 rounded-xl p-5 shadow-xl">
-                    <p class="text-darkGray">{socialsDescription()}</p>
+                    <SolidMarkdown class="text-darkGray">{socialsDescription()}</SolidMarkdown>
                     <h6 class="uppercase">{socialsTitle()}</h6>
                   </div>
                 </Show>
                 <div class="flex flex-col gap-2 rounded-xl p-5 shadow-xl">
-                  <p class="text-darkGray">{paymentsDescription()}</p>
+                  <SolidMarkdown class="text-darkGray">{paymentsDescription()}</SolidMarkdown>
                   <h6 class="uppercase">{paymentsTitle()}</h6>
                 </div>
               </div>
@@ -197,14 +184,18 @@ export default function Project(props?: ProjectType) {
               <div
                 class="h-32 w-full bg-cover bg-center bg-no-repeat"
                 style={{
-                  "background-image": `url(https://${import.meta.env.VITE_PINATA_GATEWAY}/ipfs/${mainImage()})`,
+                  "background-image": mainImage().startsWith("blob:")
+                    ? `url(${mainImage()})`
+                    : `url(https://${import.meta.env.VITE_PINATA_GATEWAY}/ipfs/${mainImage()})`,
                 }}
               />
               <div class="relative flex flex-col gap-5 p-10">
                 <div
                   class="absolute left-10 top-0 size-16 -translate-y-1/2 rounded-full bg-contain bg-center bg-no-repeat"
                   style={{
-                    "background-image": `url(https://${import.meta.env.VITE_PINATA_GATEWAY}/ipfs/${logoImage()})`,
+                    "background-image": logoImage().startsWith("blob:")
+                      ? `url(${logoImage()})`
+                      : `url(https://${import.meta.env.VITE_PINATA_GATEWAY}/ipfs/${logoImage()})`,
                   }}
                 />
                 <h4>{title()}</h4>
@@ -255,8 +246,11 @@ export default function Project(props?: ProjectType) {
               <div class="flex flex-col items-center justify-center">
                 <div class="relative">
                   <DonutChart
-                    series={[{ number: 12 }, { number: 33 }, { number: 10, notActive: true }]}
-                    labels={["On", "Du", "Tr"]}
+                    series={(props?.milestones || data.data?.milestones || []).map((el, i) => ({
+                      number: el.amount,
+                      notActive: i > 0,
+                    }))}
+                    labels={(props?.milestones || data.data?.milestones || []).map((_m, i) => `Milestone ${i}`)}
                     setColors={(data) => setColors(data)}
                   />
                   <h4 class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">$55</h4>

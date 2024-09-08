@@ -4,12 +4,9 @@ import { pinFileToIPFS } from "~/libs/serverUtils";
 export async function POST(event: APIEvent) {
   "use server";
   const data = await event.request.formData();
-  console.log(data);
   const mainImage = data.get("mainImage") as File;
   const logoImage = data.get("logoImage") as File;
-  console.log(mainImage, logoImage);
   const images = await Promise.all([pinFileToIPFS(mainImage), pinFileToIPFS(logoImage)]);
-  console.log(images);
   const fullJSON = {
     mainImage: images[0].IpfsHash,
     logoImage: images[1].IpfsHash,
@@ -30,6 +27,5 @@ export async function POST(event: APIEvent) {
     })),
   };
   const res = await pinFileToIPFS(JSON.stringify(fullJSON));
-  console.log(res);
-  return new Response();
+  return new Response(res.IpfsHash);
 }

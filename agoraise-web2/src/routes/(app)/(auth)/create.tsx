@@ -1,4 +1,4 @@
-import { useSearchParams } from "@solidjs/router";
+import { useNavigate, useSearchParams } from "@solidjs/router";
 import { For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import Form, { Input } from "~/libs/form";
@@ -8,10 +8,6 @@ import axios from "axios";
 import { BASE_URL } from "~/libs/variables";
 import { useClientSession } from "~/hooks/sessionHooks";
 
-type MilestoneType = {
-  endDate: number;
-  amount: number;
-};
 const [store, setStore] = createStore({
   title: "",
   tags: "",
@@ -26,15 +22,20 @@ const [store, setStore] = createStore({
   paymentsDescription: "",
   mainImage: "",
   logoImage: "",
-  milestones: [] as MilestoneType[],
+  milestones: [] as {
+    endDate: number;
+    amount: number;
+  }[],
 });
 export default function Create() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { wallet } = useClientSession();
-
+  const { wallet, setProjects } = useClientSession();
+  const navigate = useNavigate();
   async function submitData(data: FormData) {
     if (wallet()?.selectedAddress) data.set("owner", wallet()!.selectedAddress!);
-    await axios.post(`${BASE_URL}/api/v0/projects`, data);
+    const id = await axios.post(`${BASE_URL}/api/v0/projects`, data);
+    setProjects((p) => [...p, id.data]);
+    navigate(`/projects/${id.data}`);
   }
   return (
     <div class="flex items-center justify-center">
@@ -210,9 +211,8 @@ export default function Create() {
                         min={new Date().toISOString().split("T")[0]}
                         onBlur={(e) => {
                           const newMilestones = [...store.milestones];
-                          newMilestones[i()] = { ...m, endDate: new Date(e.target.value).getTime() / 1000 };
+                          newMilestones[i()] = { ...m, endDate: new Date(e.target.value).getTime() };
                           setStore({ milestones: newMilestones });
-                          console.log(newMilestones);
                         }}
                       />
                       <input

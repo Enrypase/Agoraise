@@ -398,11 +398,8 @@ function MultipleChoicesInput(
   const error = () => props.error || localError();
   let lastInteract = Date.now();
   function handleOpen(bool: boolean) {
-    console.log("Ciao");
-
     if (Date.now() - lastInteract < 333) return;
     lastInteract = Date.now();
-    console.log(bool);
     setOpen(bool);
   }
   return (

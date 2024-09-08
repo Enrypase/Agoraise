@@ -7,6 +7,8 @@ type ClientSessionContextType = {
   setWallet: Setter<StkType>;
   connectWallet: () => void;
   disconnectWallet: () => void;
+  projects: Accessor<string[]>;
+  setProjects: Setter<string[]>;
 };
 
 export const ClientSessionContext = createContext<ClientSessionContextType>();
@@ -15,12 +17,15 @@ export const ClientSessionProvider = (props: ParentProps) => {
   async function connectWallet() {
     const w = await connect();
     setWallet(w.wallet || null);
-    console.log(w);
   }
   async function disconnectWallet() {
     await disconnect();
     setWallet(null);
   }
+  const [projects, setProjects] = createSignal([
+    "bafkreiald37fptohhsiaz5rslq5xculszva4lrxsy2qw25lh2b7tanfa6u",
+    "bafkreignofw4qebs7por34oxqhk6o6kijpnrqhlv7unnkqbabi5lttp5mq",
+  ]);
   return (
     <ClientSessionContext.Provider
       value={{
@@ -28,6 +33,8 @@ export const ClientSessionProvider = (props: ParentProps) => {
         setWallet,
         connectWallet,
         disconnectWallet,
+        projects,
+        setProjects,
       }}
     >
       {props.children}

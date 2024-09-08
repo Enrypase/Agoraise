@@ -33,9 +33,8 @@ export async function pinFileToIPFS(file: File | string) {
         Authorization: `Bearer ${process.env.PINATA_JWT}`,
       },
     });
-    console.log(res.data);
     return res.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
