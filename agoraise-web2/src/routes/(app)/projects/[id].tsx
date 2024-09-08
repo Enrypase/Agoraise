@@ -44,22 +44,28 @@ function Votations(props: { title: string; votations: VotationType; setVotations
       <div class="flex flex-col-reverse gap-5 p-5 md:grid md:grid-cols-[max(min(25rem,25vw),333px),auto]">
         <div class="flex max-h-[75vh] flex-col gap-2 overflow-auto">
           <For each={props.votations}>
-            {(v, i) => (
-              <button
-                id={`votation_${i()}`}
-                onClick={() => setSearchParams({ votation: i() })}
-                classList={{ "bg-gray": searchParams.votation ? parseInt(searchParams.votation) === i() : false }}
-                class="mr-1 rounded-xl"
-              >
-                <h4>{v.title}</h4>
-                <p>{v.description}</p>
-              </button>
-            )}
+            {(v, i) => {
+              console.log(v);
+              return (
+                <button
+                  id={`votation_${i()}`}
+                  onClick={() => setSearchParams({ votation: i() })}
+                  classList={{ "bg-gray": searchParams.votation ? parseInt(searchParams.votation) === i() : false }}
+                  class="mr-1 rounded-xl"
+                >
+                  <h4>{v.title}</h4>
+                  <p>{v.description}</p>
+                </button>
+              );
+            }}
           </For>
           <Form
             class="mr-1 flex flex-col gap-2 rounded-xl"
             successCallback={(data) => {
-              props.setVotations((v) => [...v, { title: data.title, description: data.description, options: [] }]);
+              props.setVotations((v) => [
+                ...v,
+                { title: data.get("title"), description: data.get("description"), options: [] },
+              ]);
             }}
           >
             <Input title="Title" type="text" name="title" />
