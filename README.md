@@ -26,7 +26,7 @@ Accepting technical challenges related to account abstraction and related infras
 |MilestoneManager|0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf|[SeiTrace](https://seitrace.com/address/0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf?chain=arctic-1&page=1&next_page_params=%257B%257D)|[Explorer](https://evm-explorer-testnet.alephzero.org/address/0x14AFfECbAc564E56Dc0fb7a1aE6F4eB7B1cc01Cf)|
 |CampaignVault|0xd15361cCB4dD2e30C079641C4F78480608F94636|[SeiTrace](https://seitrace.com/address/0xd15361cCB4dD2e30C079641C4F78480608F94636?chain=arctic-1&page=1&next_page_params=%257B%257D)|[Explorer](https://evm-explorer-testnet.alephzero.org/address/0xd15361cCB4dD2e30C079641C4F78480608F94636)|
 
-Despite the smart contracts, a set of tools (bundler, node and RPC server) have been installed on a VM kindly provided by **[dbForest]**(https://dbForest.org);
+Despite the smart contracts, a set of tools (bundler, node and RPC server) have been installed on a VM kindly provided by [**dbForest**](https://dbForest.org);
 
 ## Acknowledgement
 This project relies on repositories developed, supported and maintained (fully or partially) by open source communities.
