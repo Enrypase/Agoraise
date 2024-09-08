@@ -1,7 +1,9 @@
 import { Match, Switch } from "solid-js";
 import Svg from "./Svg";
 
-export default function Social(props: { name: "discord" | "facebook" | "medium" | "telegram" | "x" | "youtube" }) {
+export default function Social(props: {
+  name: "discord" | "facebook" | "medium" | "telegram" | "x" | "youtube" | string;
+}) {
   const common = "size-6";
   return (
     <Switch fallback={<div class="size-16 rounded-full bg-main" />}>

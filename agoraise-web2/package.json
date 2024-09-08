@@ -19,6 +19,7 @@
     "bcryptjs": "^2.4.3",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "pinata": "^1.1.0",
     "solid-apexcharts": "^0.3.4",
     "solid-js": "^1.8.22",
     "solid-markdown": "^2.0.13",

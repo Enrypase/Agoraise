@@ -1,6 +1,6 @@
 import { For, JSX, Match, Setter, Show, Switch, children, createEffect, createMemo, createSignal } from "solid-js";
 import { ZodType, z } from "zod";
-import { emailSchema, mustContain, passwordSchema } from "~/routes/libs/zodSchemas";
+import { emailSchema, mustContain, passwordSchema } from "~/libs/zodSchemas";
 import { AxiosError } from "axios";
 import { PopIn } from "./animations";
 import { useComputedVars } from "~/hooks/computedVarsHook";
@@ -20,7 +20,7 @@ type BaseInputType = {
 };
 type InputType =
   | (BaseInputType & {
-      type: "text" | "number" | "phone" | "file" | "email" | "password" | "submit";
+      type: "text" | "number" | "phone" | "file" | "email" | "password" | "submit" | "textarea";
       options?: never;
     })
   | (BaseInputType & {
@@ -207,6 +207,40 @@ export function TextInput(props: LocalInputType) {
   );
 }
 
+export function TextAreaInput(props: LocalInputType) {
+  const [localValue, setLocalValue] = createSignal("");
+  const [localError, setLocalError] = createSignal("");
+  const error = () => props.error || localError();
+  return (
+    <div class={commonMainStyle + " h-full"}>
+      <p>{props.title}</p>
+      <div
+        class={commonInputStyle + " h-full"}
+        classList={{
+          "border-red text-red": !!error(),
+          "border-main text-main": !error(),
+        }}
+      >
+        <textarea
+          name={props.name || "textarea"}
+          class={`${inputStyle}`}
+          value={props.value || localValue()}
+          onInput={(e) => {
+            props.setValue?.(e.target.value) || setLocalValue(e.target.value);
+          }}
+          data-type="text"
+          placeholder={props.placeholder}
+          required={props.required}
+          on:validationError={(err: CustomEvent) => setLocalError(err.detail.message)}
+        />
+      </div>
+      <Show when={error()}>
+        <small class="animate-fadeIn text-red">{error()}</small>
+      </Show>
+    </div>
+  );
+}
+
 function NumberInput(props: LocalInputType & { minTicket?: number }) {
   const [localValue, setLocalValue] = createSignal("");
   const [localError, setLocalError] = createSignal("");
@@ -364,8 +398,11 @@ function MultipleChoicesInput(
   const error = () => props.error || localError();
   let lastInteract = Date.now();
   function handleOpen(bool: boolean) {
+    console.log("Ciao");
+
     if (Date.now() - lastInteract < 333) return;
     lastInteract = Date.now();
+    console.log(bool);
     setOpen(bool);
   }
   return (
@@ -396,23 +433,21 @@ function MultipleChoicesInput(
         />
       </div>
       <Show when={open()}>
-        <PopIn class="absolute left-0 top-full z-10 w-full">
-          <ul class="flex max-h-36 w-full flex-col overflow-auto rounded-xl bg-main p-2 text-white">
-            <For each={props.options.filter((el) => el.value.toString().toLowerCase().includes(state().toLowerCase()))}>
-              {(el) => (
-                <button
-                  onClick={() => {
-                    setState(el.value.toString());
-                    setOpen(false);
-                    props.setValue?.(el.value.toString());
-                  }}
-                >
-                  {el.text}
-                </button>
-              )}
-            </For>
-          </ul>
-        </PopIn>
+        <ul class="flex max-h-36 w-full flex-col overflow-auto rounded-xl bg-main p-2 text-white">
+          <For each={props.options.filter((el) => el.value.toString().toLowerCase().includes(state().toLowerCase()))}>
+            {(el) => (
+              <button
+                onClick={() => {
+                  setState(el.value.toString());
+                  setOpen(false);
+                  props.setValue?.(el.value.toString());
+                }}
+              >
+                {el.text}
+              </button>
+            )}
+          </For>
+        </ul>
       </Show>
       <Show when={error()}>
         <small class="animate-fadeIn text-red">{error()}</small>
@@ -514,6 +549,16 @@ export function Input(props: InputType) {
         />
       }
     >
+      <Match when={props.type === "textarea"}>
+        <TextAreaInput
+          title={props.title}
+          placeholder={props.placeholder}
+          value={props.value as string | undefined}
+          name={props.name}
+          required={props.required}
+          setValue={(data) => props.fn?.(data)}
+        />
+      </Match>
       <Match when={props.type === "submit"}>
         <SubmitInput text={(props.value as string | undefined) || "Submit!"} fn={() => props.fn?.("")} />
       </Match>
@@ -616,12 +661,18 @@ export default function Form(props: {
   const [formError, setFormError] = createSignal("");
   const [errors, setErrors] = createSignal([""]);
 
-  const validInputs = [] as HTMLInputElement[];
+  const validInputs = [] as (HTMLInputElement | HTMLTextAreaElement)[];
   const resolved = children(() => props.children).toArray() as HTMLDivElement[];
   resolved.forEach((input) => {
     // The following function doesn't exist on the server
     input.querySelectorAll?.("input").forEach((element) => {
       const el = element as HTMLInputElement;
+      if (el.dataset.type) {
+        validInputs.push(el);
+      }
+    });
+    input.querySelectorAll?.("textarea").forEach((element) => {
+      const el = element as HTMLTextAreaElement;
       if (el.dataset.type) {
         validInputs.push(el);
       }
@@ -665,7 +716,7 @@ export default function Form(props: {
             }`,
           });
         }
-      } else if (el.type === "text" && el.required) {
+      } else if ((el.type === "text" || el.type === "textarea") && el.required) {
         obj[el.name] = z.string().min(1, {
           message: `${i}-${
             el.dataset.validationErrorMsg || `Please insert a valid ${el.title?.toLowerCase() || "value"}`
